@@ -1,0 +1,36 @@
+
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <title>Event Loop - Iteration test</title>
+  </head>
+
+  <body>
+    <div id="fps-meter"></div>
+    
+    <!-- TODO -->
+    <!-- Example of javascript experiment -->
+    <!-- /TODO -->
+
+    <script src="../scripts/fpsmeter.js"></script>
+    <script>
+      var meter = new FPSMeter(document.getElementById('fps-meter'), {
+        show: 'ms',
+        heat: true,
+        graph: true,
+        left: 'auto',
+        right: '5px'
+      });
+      function tick() {
+        meter.tick();
+        requestAnimationFrame(tick);
+      }
+
+      tick();
+    </script>
+
+  </body>
+</html>
+
