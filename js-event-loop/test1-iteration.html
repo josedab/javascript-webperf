@@ -10,9 +10,82 @@
   <body>
     <div id="fps-meter"></div>
     
-    <!-- TODO -->
-    <!-- Example of javascript experiment -->
-    <!-- /TODO -->
+
+        <section>
+          <div class="floater floater-left">
+            <button id="dom-single-stack">Single Stack</button> 
+            <code id="dom-single-stack-result">...</code>
+          </div>
+
+          <h3>Single Stack: Freeze Rendering</h3>
+          
+          <pre>
+            <code class="javascript">
+              var LIMIT = 200000;
+
+              function drawMany() {
+                for (var i = 0; i &lt; LIMIT; i++) {
+                  output.appendChild(document.createElement('div'));
+                }
+              }
+            </code>
+          </pre>
+
+          <div class="dom-output" id="dom-output-single"></div>
+
+          <script>
+            (function() {
+              var LIMIT = 200000;
+              var RENDER_WAIT = 10;
+
+              var buttonSingleStack = document.getElementById('dom-single-stack');
+              var resultSingleStack = document.getElementById('dom-single-stack-result');
+
+              var output = document.getElementById('dom-output-single');
+
+              function clear() {
+                while (output.firstChild) {
+                  output.removeChild(output.firstChild);
+                }
+              }
+
+              function hide() {
+                output.style.display = "none";
+              }
+
+              function show() {
+                output.style.display = "block";
+              }
+
+              function drawMany() {
+                for (var i = 0; i < LIMIT; i++) {
+                  output.appendChild(document.createElement('div'));
+                }
+              }
+
+              buttonSingleStack.addEventListener('click', function() {
+                clear();
+                resultSingleStack.innerHTML = '...';
+                // hide();
+
+                setTimeout(function() {
+                  var start = new Date();
+
+                  drawMany();
+
+                  setTimeout(function() {
+                    var end = new Date();
+                    // show();
+
+                    resultSingleStack.innerHTML = ((end - start) - RENDER_WAIT) + 'ms';
+
+                    clear();
+                  }, RENDER_WAIT); // Wait long enough so that rendering kicks in for certain
+                }, RENDER_WAIT);
+              });
+            })();
+          </script>
+        </section>
 
     <script src="../scripts/fpsmeter.js"></script>
     <script>
