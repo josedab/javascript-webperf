@@ -1,0 +1,126 @@
+
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <title>Event Loop - Iteration test</title>
+  </head>
+
+  <body>
+    <div id="fps-meter"></div>
+    
+      <section>
+        <h3>
+          Queueing events: better rendering 
+        </h3>
+        <p>
+          In this example, we are going to do event processing by batches. Doing it in batches, we don't block completely the thread. To the end user it may represent the same result but with a improved 'perceived performance'.
+        <p>
+        
+        <pre>
+          <code class="javascript">
+            var LIMIT = 200000;
+            var CHUNK = 400;
+
+            function drawFew(start, callback) {
+              for (var i = 0; i &lt; CHUNK; i++) {
+                output.appendChild(document.createElement('div'));
+              }
+
+              if (start &gt;= LIMIT) return callback();
+
+              setTimeout(function() {
+                drawFew(start + CHUNK, callback);
+              }, 0);
+            }
+          </code>
+        </pre>
+
+
+        <div class="floater floater-left">
+          <button id="dom-many-stack">Batch event processing</button> 
+          <code id="dom-many-stack-result">...</code>
+        </div>
+
+        <div class="dom-output" id="dom-output-many"></div>
+
+        <script>
+          (function() {
+            var LIMIT = 200000;
+            var CHUNK = 400;
+            var RENDER_WAIT = 10;
+
+            var buttonManyStack = document.getElementById('dom-many-stack');
+            var resultManyStack = document.getElementById('dom-many-stack-result');
+
+            var output = document.getElementById('dom-output-many');
+
+            function clear() {
+              while (output.firstChild) {
+                output.removeChild(output.firstChild);
+              }
+            }
+
+            function hide() {
+              output.style.display = "none";
+            }
+
+            function show() {
+              output.style.display = "block";
+            }
+
+            function drawFew(start, callback) {
+              for (var i = 0; i < CHUNK; i++) {
+                output.appendChild(document.createElement('div'));
+              }
+
+              if (start >= LIMIT) {
+                return callback();
+              }
+
+              setTimeout(function() {
+                drawFew(start + CHUNK, callback);
+              }, 0);
+            }
+
+            buttonManyStack.addEventListener('click', function() {
+              clear();
+
+              // hide();
+              var start = new Date();
+              resultManyStack.innerHTML = '...';
+
+              drawFew(0, function() {
+                var end = new Date();
+                // show();
+
+                resultManyStack.innerHTML = (end - start) + 'ms';
+
+                clear();
+              });
+            });
+          })();
+        </script>
+      </section>
+
+    <script src="../scripts/fpsmeter.js"></script>
+    <script>
+      var meter = new FPSMeter(document.getElementById('fps-meter'), {
+        show: 'ms',
+        heat: true,
+        graph: true,
+        left: 'auto',
+        right: '5px'
+      });
+      function tick() {
+        meter.tick();
+        requestAnimationFrame(tick);
+      }
+
+      tick();
+    </script>
+
+  </body>
+</html>
+
