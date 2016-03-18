@@ -12,24 +12,34 @@
     
 
         <section>
-          <div class="floater floater-left">
-            <button id="dom-single-stack">Single Stack</button> 
-            <code id="dom-single-stack-result">...</code>
-          </div>
-
-          <h3>Single Stack: Freeze Rendering</h3>
-          
+          <h3>
+            Single Stack: Freeze Rendering
+          </h3>
+          <p>
+            In this example, we are going to test how getting elements from the events queue and stacking them one by one could affect the performance of our javascript application.
+          <p>
+          <p>
+            The code is:
+          </p>
           <pre>
             <code class="javascript">
               var LIMIT = 200000;
 
-              function drawMany() {
+              function createDiv() {
                 for (var i = 0; i &lt; LIMIT; i++) {
                   output.appendChild(document.createElement('div'));
                 }
               }
             </code>
           </pre>
+          <p>
+            To test the example, click on the following button:
+          </p>
+
+          <div class="floater floater-left">
+            <button id="dom-single-stack">Single Stack</button> 
+            <code id="dom-single-stack-result">...</code>
+          </div>
 
           <div class="dom-output" id="dom-output-single"></div>
 
@@ -57,7 +67,7 @@
                 output.style.display = "block";
               }
 
-              function drawMany() {
+              function createDiv() {
                 for (var i = 0; i < LIMIT; i++) {
                   output.appendChild(document.createElement('div'));
                 }
@@ -71,7 +81,7 @@
                 setTimeout(function() {
                   var start = new Date();
 
-                  drawMany();
+                  createDiv();
 
                   setTimeout(function() {
                     var end = new Date();
