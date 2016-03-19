@@ -1,0 +1,131 @@
+
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <title>Event Loop - Iteration test</title>
+  </head>
+
+  <body>
+    <div id="fps-meter"></div>
+    
+    <section>
+      <h3>
+        Web workers: no ui blocking
+      </h3>
+      <p>
+        In this example, we are going to do event processing by batches. Doing it in batches, we don't block completely the thread. To the end user it may represent the same result but with a improved 'perceived performance'.
+        We will create 200k divs with no display. What we are trying to measure here is the time it takes to create them and see if this operation blocks the ui thread.
+      <p>
+        <div>
+          <button id="work-current">Current Thread</button>
+          <code id="work-current-result">...</code>
+        </div>
+
+        <script>
+          (function() {
+            var buttonCurrent = document.getElementById('work-current');
+            var resultCurrent = document.getElementById('work-current-result');
+
+            buttonCurrent.addEventListener('click', function() {
+              var start = new Date();
+              resultCurrent.innerHTML = '...';
+              var pi = 0;
+              var n = 1;
+              for (i = 0; i <= 1000000000; i++) {
+                pi = pi + (4/n) - (4 / (n + 2));
+                n = n + 4;
+              }
+
+              var end = new Date();
+
+              void pi;
+
+              resultCurrent.innerHTML = (end - start) + 'ms';
+            });
+          }());
+        </script>
+
+        <div class="floater floater-right ">
+          <button id="work-worker">Worker Thread</button>
+          <code id="work-worker-result">...</code>
+        </div>
+
+        <script>
+          (function() {
+            var buttonWorker = document.getElementById('work-worker');
+            var resultWorker = document.getElementById('work-worker-result');
+
+            try {
+              var worker = new Worker('scripts/task.js');
+
+              var start, end;
+
+              worker.onmessage = function(e) {
+                var end = new Date();
+
+                void e.data;
+                resultWorker.innerHTML = (end - start) + 'ms';
+                console.log(e);
+              };
+
+              buttonWorker.addEventListener('click', function() {
+                start = new Date();
+                resultWorker.innerHTML = '...';
+                worker.postMessage({iterations: 1000000000});
+              });
+            } catch(e) {
+              console.error(e);
+              resultWorker.innerHTML = e.name;
+            }
+          }());
+        </script>
+
+        <h3>Web Workers</h3>
+        <ul>
+          <li>Separate JavaScript instance, has its own Event Loop</li>
+          <li>Message Passing via JSON structures</li>
+          <li>No deadlocks or race conditions, working with “copies”</li>
+          <li>Can't touch the DOM, tho AJAX and WebSockets work</li>
+        </ul>
+
+          <pre>
+            <code class="javascript">
+              // main.js
+              var worker = new Worker('task.js');
+              worker.postMessage({iterations: 5000000000});
+              worker.onmessage = function(e) { console.log(e.data); };
+
+              // task.js
+              onmessage = function(e) {
+              var pi = 0, n = 1;
+              for (i = 0; i &lt;= e.data.iterations; i++) {
+              pi = pi + (4/n) - (4 / (n + 2)); n += 4;
+              }
+              postMessage(pi);
+              };
+            </code>
+          </pre>
+      </section>
+
+    <script src="../scripts/fpsmeter.js"></script>
+    <script>
+      var meter = new FPSMeter(document.getElementById('fps-meter'), {
+        show: 'ms',
+        heat: true,
+        graph: true,
+        left: 'auto',
+        right: '5px'
+      });
+      function tick() {
+        meter.tick();
+        requestAnimationFrame(tick);
+      }
+
+      tick();
+    </script>
+
+  </body>
+</html>
+
